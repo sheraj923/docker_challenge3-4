@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - node-service
+    networks:
+      - app-network
+
+  node-service:
+    build: ./api
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+    expose:
+      - "3000"
+    networks:
+      - app-network
+
+  db:
+    build: ./db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "3307:3307"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
